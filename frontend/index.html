@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexo IA - Prototipo V2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-brand"><div class="brand-mark">N</div><div><strong>Nexo IA</strong><span>Acceso seguro · V4.3.1</span></div></div>
+      <h1>Iniciar sesión</h1>
+      <p>Ingresa con tu usuario asignado.</p>
+      <form id="loginForm">
+        <label>Usuario<input id="loginUser" autocomplete="username" required placeholder="admin" value="admin"></label>
+        <label>Contraseña<input id="loginPassword" type="password" autocomplete="current-password" required placeholder="••••••••"></label>
+        <button class="btn primary login-submit" type="submit">Entrar</button>
+      </form>
+      <div class="login-test-creds"><strong>Acceso de prueba</strong><span>Usuario: admin</span><span>Contraseña: 12345678</span></div><div id="loginError" class="login-error"></div>
+    </div>
+  </div>
+  <div id="secureApp" class="secure-app hidden-app">
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="logo">N</div>
+        <div class="brand-text">
+          <strong>Nexo IA</strong>
+          <span>Barbería Central</span>
+        </div>
+        <button class="icon-btn collapse" id="collapseBtn">‹</button>
+      </div>
+      <nav>
+        <button class="nav-item admin-only" data-view="empresas"><span>▣</span><label>Mis empresas</label></button>
+        <button class="nav-item admin-only" data-view="usuarios"><span>♜</span><label>Usuarios y permisos</label></button>
+        <button class="nav-item active" data-view="dashboard"><span>⌂</span><label>Dashboard</label></button>
+        <button class="nav-item" data-view="agenda"><span>▦</span><label>Agenda</label></button>
+        <button class="nav-item" data-view="disponibilidad"><span>◷</span><label>Disponibilidad</label></button>
+        <button class="nav-item" data-view="citas"><span>✓</span><label>Citas</label></button>
+        <button class="nav-item" data-view="clientes"><span>♙</span><label>Clientes</label></button>
+        <button class="nav-item" data-view="personal"><span>♟</span><label>Personal</label></button>
+        <button class="nav-item" data-view="servicios"><span>✂</span><label>Servicios</label></button>
+        <button class="nav-item" data-view="ia"><span>✦</span><label>Recepción IA</label><em>3</em></button>
+        <button class="nav-item" data-view="espera"><span>◷</span><label>Lista de espera</label></button>
+        <button class="nav-item" data-view="reportes"><span>▥</span><label>Reportes</label></button>
+      </nav>
+      <div class="sidebar-footer"><div class="session-user"><strong id="sessionName">Usuario</strong><small id="sessionRole">Empresa</small></div><button class="nav-item" id="logoutBtn"><span>↪</span><label>Cerrar sesión</label></button>
+        <button class="nav-item" data-view="config"><span>⚙</span><label>Configuración</label></button>
+        <div class="user-card">
+          <div class="avatar">FG</div>
+          <div class="brand-text"><strong>Fernando</strong><span>Administrador</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="pageTitle">Dashboard</h1>
+          <p id="pageSubtitle">Sucursal Providencia</p>
+        </div>
+        <div class="company-switch">
+          <select id="companySwitch"></select>
+        </div>
+        <div class="top-actions">
+          <button class="btn secondary context-checkin" id="checkinBtn">Checador</button>
+          <button class="btn primary context-appointment" id="newAppointmentBtn">+ Nueva cita</button>
+          <button class="icon-btn" id="themeBtn">◐</button>
+        </div>
+      </header>
+
+
+      <section id="empresas" class="view">
+        <div class="master-header panel">
+          <div>
+            <span class="eyebrow">Panel maestro</span>
+            <h2>Mis empresas</h2>
+            <p>Administra todos tus clientes desde una sola plataforma.</p>
+          </div>
+          <button class="btn primary" id="newCompanyBtn">+ Nueva empresa</button>
+        </div>
+
+        <div class="master-stats">
+          <article class="stat-card"><div class="stat-head"><span class="stat-icon">▣</span><small>Total</small></div><h3 id="masterCompanies">0</h3><p>Empresas activas</p><span class="trend">Multiempresa</span></article>
+          <article class="stat-card"><div class="stat-head"><span class="stat-icon">✦</span><small>IA</small></div><h3 id="masterAI">0</h3><p>Con agente activo</p><span class="trend">WhatsApp / llamadas</span></article>
+          <article class="stat-card"><div class="stat-head"><span class="stat-icon">▦</span><small>Mes</small></div><h3 id="masterAppointments">0</h3><p>Citas registradas</p><span class="trend">Todas las empresas</span></article>
+          <article class="stat-card"><div class="stat-head"><span class="stat-icon">$</span><small>MRR</small></div><h3 id="masterMRR">$0</h3><p>Ingreso mensual estimado</p><span class="trend">Planes activos</span></article>
+        </div>
+
+        <div class="company-grid" id="companyGrid"></div>
+      </section>
+
+
+      <section id="usuarios" class="view">
+        <div class="section-head">
+          <div><h2>Usuarios y permisos</h2><p>Crea accesos separados para cada empresa y controla qué módulos puede ver cada usuario.</p></div>
+          <button class="btn primary" id="newCompanyUserBtn">+ Crear usuario</button>
+        </div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Usuario</th><th>Empresa</th><th>Rol</th><th>Permisos</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="adminUsersTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="dashboard" class="view active">
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-head"><span class="stat-icon">▦</span><small>Hoy</small></div><h3 id="statToday">0</h3><p>Citas de hoy</p><span class="trend" id="statTodaySub">Cargando</span></article>
+          <article class="stat-card"><div class="stat-head"><span class="stat-icon">✓</span><small id="statConfirmedPct">0%</small></div><h3 id="statConfirmed">0</h3><p>Confirmadas</p><span class="trend" id="statPending">0 pendientes</span></article>
+          <article class="stat-card"><div class="stat-head"><span class="stat-icon">♟</span><small>Ahora</small></div><h3 id="statStaff">0/0</h3><p>Personal presente</p><span class="trend" id="statAvailable">0 disponibles</span></article>
+          <article class="stat-card"><div class="stat-head"><span class="stat-icon">$</span><small>Estimado</small></div><h3 id="statSales">$0</h3><p>Ventas del día</p><span class="trend">Basado en citas activas</span></article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="panel activity-panel">
+            <div class="panel-title"><div><h2>Recepción IA — En vivo</h2><p>Actividad simulada del agente</p></div><span class="live-dot">● En línea</span></div>
+            <div class="activity-list" id="activityList"></div>
+            <button class="link-btn" data-view-jump="ia">Ver todas las conversaciones →</button>
+          </article>
+          <div class="right-stack">
+            <article class="panel">
+              <div class="panel-title"><div><h2>Personal ahora</h2><p>Estado en sucursal</p></div></div>
+              <div class="staff-list" id="staffList"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-title"><div><h2>Próximas citas</h2><p>Siguientes citas registradas</p></div></div>
+              <div class="appointments" id="nextAppointments"></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="agenda" class="view">
+        <div class="agenda-toolbar">
+          <div><button class="btn secondary" id="prevDay">‹</button><button class="btn secondary" id="todayBtn">Hoy</button><button class="btn secondary" id="nextDay">›</button></div>
+          <strong id="agendaDateLabel">Hoy</strong>
+          <div class="agenda-actions">
+            <select id="agendaStaffFilter"><option value="">Todo el personal</option></select>
+            <select id="agendaView"><option>Vista diaria</option></select>
+          </div>
+        </div>
+        <div class="agenda-note">Haz clic en un espacio disponible para abrir una nueva cita con ese colaborador y horario.</div><div class="calendar" id="calendar"></div>
+      </section>
+
+
+      <section id="disponibilidad" class="view">
+        <div class="availability-layout">
+          <article class="panel availability-filters">
+            <div class="panel-title">
+              <div><h2>Consultar disponibilidad</h2><p>Simula lo que consultará el agente IA antes de ofrecer una cita.</p></div>
+            </div>
+            <label>Servicio<select id="availabilityService"></select></label>
+            <label>Personal<select id="availabilityStaff"><option value="">Cualquiera disponible</option></select></label>
+            <label>Fecha<input id="availabilityDate" type="date"></label>
+            <div class="two-col">
+              <label>Desde<input id="availabilityFrom" type="time" value="09:00"></label>
+              <label>Hasta<input id="availabilityTo" type="time" value="20:00"></label>
+            </div>
+            <button class="btn primary full-btn" id="searchAvailabilityBtn">Buscar horarios</button>
+            <div class="availability-help">
+              <strong>Se toman en cuenta:</strong>
+              <span>Horario laboral</span><span>Citas existentes</span>
+              <span>Duración del servicio</span><span>Descansos / vacaciones / bloqueos</span>
+            </div>
+          </article>
+          <article class="panel">
+            <div class="panel-title">
+              <div><h2>Horarios disponibles</h2><p id="availabilitySummary">Selecciona los datos y pulsa Buscar horarios.</p></div>
+            </div>
+            <div id="availabilityResults" class="availability-results">
+              <div class="empty-state">Aquí aparecerán los horarios que el agente puede ofrecer.</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="citas" class="view">
+        <article class="panel">
+          <div class="panel-title"><div><h2>Gestión de citas</h2><p>Confirma, reprograma, inicia o cancela citas</p></div>
+            <div class="filters"><select id="appointmentFilter"><option value="all">Todas</option><option value="Confirmada">Confirmadas</option><option value="Pendiente">Pendientes</option><option value="En servicio">En servicio</option><option value="Cancelada">Canceladas</option></select></div>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Hora</th><th>Cliente</th><th>Servicio</th><th>Personal</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="appointmentsTable"></tbody></table></div>
+        </article>
+      </section>
+
+      <section id="clientes" class="view">
+        <div class="split-layout">
+          <article class="panel">
+            <div class="panel-title"><div><h2>Clientes</h2><p>CRM y preferencias</p></div><button class="btn primary" id="newClientBtn">+ Cliente</button></div>
+            <input class="search" id="clientSearch" placeholder="Buscar por nombre o teléfono" />
+            <div id="clientList" class="client-list"></div>
+          </article>
+          <article class="panel" id="clientDetail">
+            <div class="empty-state">Selecciona un cliente para ver su historial.</div>
+          </article>
+        </div>
+      </section>
+
+      <section id="personal" class="view">
+        <div class="section-head">
+          <div><h2>Personal</h2><p>Agrega colaboradores, asigna servicios, horarios y descansos.</p></div>
+          <button class="btn primary" id="newStaffBtn">+ Agregar personal</button>
+        </div>
+        <div class="people-grid" id="peopleGrid"></div>
+      </section>
+
+      <section id="servicios" class="view">
+        <article class="panel">
+          <div class="panel-title"><div><h2>Servicios</h2><p>Duración, precio y personal autorizado</p></div><button class="btn primary" id="newServiceBtn">+ Servicio</button></div>
+          <div class="service-grid" id="serviceGrid"></div>
+        </article>
+      </section>
+
+      <section id="ia" class="view">
+        <div class="ia-layout">
+          <article class="panel conversation-list">
+            <div class="panel-title"><div><h2>Conversaciones</h2><p>Llamadas y WhatsApp</p></div></div>
+            <div id="conversationList"></div>
+          </article>
+          <article class="panel chat-panel">
+            <div class="chat-head"><div><strong id="chatName">Luis Mendoza</strong><small id="chatMeta">WhatsApp · Cliente frecuente</small></div><button class="btn secondary" id="takeConversation">Tomar conversación</button></div>
+            <div class="messages" id="messages"></div>
+            <div class="chat-input"><input id="operatorMessage" placeholder="Escribe un mensaje como operador..." /><button class="btn primary" id="sendOperator">Enviar</button></div>
+          </article>
+          <article class="panel action-panel">
+            <div class="panel-title"><div><h2>Acciones de IA</h2><p>Interpretación</p></div></div>
+            <div id="aiActions"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="espera" class="view">
+        <article class="panel">
+          <div class="panel-title"><div><h2>Lista de espera</h2><p>Clientes que quieren un horario si se libera</p></div><button class="btn primary" id="newWaitBtn">+ Agregar</button></div>
+          <div class="wait-list" id="waitList"></div>
+        </article>
+      </section>
+
+      <section id="reportes" class="view">
+        <div class="report-grid">
+          <article class="panel"><h2>Indicadores</h2><div class="report-kpi"><span>Citas generadas por IA</span><strong id="reportIA">0</strong></div><div class="report-kpi"><span>No-shows</span><strong id="reportNoShow">0</strong></div><div class="report-kpi"><span>Ingresos estimados</span><strong id="reportRevenue">$0</strong></div></article>
+          <article class="panel"><h2>Origen de citas</h2><div id="originBars" class="bars"></div></article>
+        </div>
+      </section>
+
+      <section id="config" class="view">
+        <div class="config-grid">
+          <article class="panel">
+            <h2>Identidad del agente</h2>
+            <label>Nombre del agente<input id="agentName" /></label>
+            <label>Saludo<textarea id="agentGreeting"></textarea></label>
+            <label>Tono<select id="agentTone"><option>Amable y profesional</option><option>Casual</option><option>Formal</option></select></label>
+          </article>
+          <article class="panel">
+            <h2>Permisos</h2>
+            <label class="switch-row"><span>Agendar citas</span><input type="checkbox" id="permBook"></label>
+            <label class="switch-row"><span>Reprogramar</span><input type="checkbox" id="permReschedule"></label>
+            <label class="switch-row"><span>Cancelar</span><input type="checkbox" id="permCancel"></label>
+            <label class="switch-row"><span>Informar precios</span><input type="checkbox" id="permPrices"></label>
+            <label class="switch-row"><span>Aplicar descuentos</span><input type="checkbox" id="permDiscount"></label>
+          </article>
+          <article class="panel">
+            <h2>Reglas de agenda</h2>
+            <label>Anticipación mínima (min)<input type="number" id="minAdvance" min="0"></label>
+            <label>Bloqueo temporal (min)<input type="number" id="holdMinutes" min="1"></label>
+            <label>Recordatorio previo (horas)<input type="number" id="reminderHours" min="1"></label>
+          </article>
+          
+          <article class="panel admin-account-panel admin-only" id="adminAccountPanel">
+            <div class="panel-title">
+              <div>
+                <h2>Cuenta de administrador</h2>
+                <p>Cambia tu nombre, usuario, correo o contraseña de acceso.</p>
+              </div>
+            </div>
+            <div class="two-col">
+              <label>Nombre<input id="profileName" placeholder="Administrador Nexo IA"></label>
+              <label>Usuario<input id="profileUsername" placeholder="admin"></label>
+            </div>
+            <div class="two-col">
+              <label>Correo<input id="profileEmail" type="email" placeholder="admin@nexoia.mx"></label>
+              <label>Nueva contraseña<input id="profilePassword" type="password" minlength="8" placeholder="Déjala vacía para conservar la actual"><small class="field-help">Mínimo 8 caracteres.</small></label>
+            </div>
+            <div id="profileError" class="form-error"></div>
+            <button class="btn primary" id="saveAdminProfile">Guardar cuenta de administrador</button>
+          </article>
+
+          <article class="panel"><h2>Guardar cambios</h2><p class="muted">Estas preferencias se guardan en tu navegador para el prototipo.</p><button class="btn primary" id="saveConfig">Guardar configuración</button></article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal nueva cita -->
+  <div class="modal" id="appointmentModal"><div class="modal-card">
+    <div class="modal-head"><h2>Nueva cita</h2><button class="icon-btn close-modal">×</button></div>
+    <label>Cliente<select id="apptClient"></select></label>
+    <label>Servicio<select id="apptService"></select></label>
+    <label>Personal<select id="apptStaff"></select></label>
+    <div class="two-col"><label>Fecha<input id="apptDate" type="date"/></label><label>Hora<input id="apptTime" type="time"/></label></div>
+    <label>Origen<select id="apptOrigin"><option>Recepción</option><option>WhatsApp IA</option><option>Llamada IA</option><option>Web</option></select></label>
+    <div class="modal-actions"><button class="btn secondary close-modal">Cancelar</button><button class="btn primary" id="saveAppointment">Crear cita</button></div>
+  </div></div>
+
+  <!-- Modal reprogramar -->
+  <div class="modal" id="rescheduleModal"><div class="modal-card">
+    <div class="modal-head"><h2>Reprogramar cita</h2><button class="icon-btn close-reschedule">×</button></div>
+    <input type="hidden" id="rescheduleId">
+    <div class="two-col"><label>Fecha<input id="rescheduleDate" type="date"/></label><label>Hora<input id="rescheduleTime" type="time"/></label></div>
+    <div class="modal-actions"><button class="btn secondary close-reschedule">Cancelar</button><button class="btn primary" id="saveReschedule">Guardar</button></div>
+  </div></div>
+
+  <!-- Modal checador -->
+  <div class="modal" id="checkinModal"><div class="modal-card checker">
+    <div class="modal-head"><h2>Checador</h2><button class="icon-btn close-checkin">×</button></div>
+    <p>Registra entrada o salida. El estado se reflejará en el sistema.</p>
+    <div id="checkerList"></div>
+  </div></div>
+
+  <!-- Modal servicio -->
+  <div class="modal" id="serviceModal"><div class="modal-card">
+    <div class="modal-head"><h2>Nuevo servicio</h2><button class="icon-btn close-service">×</button></div>
+    <label>Nombre<input id="serviceName"></label>
+    <div class="two-col"><label>Precio<input id="servicePrice" type="number"></label><label>Duración (min)<input id="serviceDuration" type="number"></label></div>
+    <div class="modal-actions"><button class="btn secondary close-service">Cancelar</button><button class="btn primary" id="saveService">Guardar</button></div>
+  </div></div>
+
+  <!-- Modal cliente -->
+  <div class="modal" id="clientModal"><div class="modal-card">
+    <div class="modal-head"><h2>Nuevo cliente</h2><button class="icon-btn close-client">×</button></div>
+    <label>Nombre<input id="clientName"></label>
+    <label>Teléfono<input id="clientPhone"></label>
+    <label>Notas<textarea id="clientNotes"></textarea></label>
+    <div class="modal-actions"><button class="btn secondary close-client">Cancelar</button><button class="btn primary" id="saveClient">Guardar</button></div>
+  </div></div>
+
+
+  <div class="modal" id="companyModal">
+    <div class="modal-card wizard-card">
+      <div class="modal-head">
+        <div><span class="eyebrow">Alta de cliente</span><h2 id="wizardTitle">Nueva empresa</h2></div>
+        <button class="icon-btn close-company">×</button>
+      </div>
+
+      <div class="wizard-steps">
+        <span class="active" data-stepdot="1">1</span><i></i>
+        <span data-stepdot="2">2</span><i></i>
+        <span data-stepdot="3">3</span><i></i>
+        <span data-stepdot="4">4</span>
+      </div>
+
+      <div class="wizard-step active" data-step="1">
+        <h3>Datos de la empresa</h3>
+        <label>Nombre comercial<input id="companyName" placeholder="Ej. Estética Glam"></label>
+        <div class="two-col">
+          <label>Giro<select id="companyType"><option>Barbería</option><option>Estética</option><option>Spa</option><option>Grooming</option><option>Veterinaria</option><option>Consultorio</option><option>Otro</option></select></label>
+          <label>Plan<select id="companyPlan"><option value="1490">Básico — $1,490</option><option value="2490" selected>Pro — $2,490</option><option value="3990">Premium — $3,990</option></select></label>
+        </div>
+        <label>Logo<input id="companyLogo" type="file" accept="image/*"></label>
+      </div>
+
+      <div class="wizard-step" data-step="2">
+        <h3>Contacto y presencia digital</h3>
+        <label>Teléfono<input id="companyPhone" placeholder="33 0000 0000"></label>
+        <label>WhatsApp<input id="companyWhatsapp" placeholder="33 0000 0000"></label>
+        <label>Instagram<input id="companyInstagram" placeholder="@negocio"></label>
+        <label>Facebook<input id="companyFacebook" placeholder="facebook.com/negocio"></label>
+      </div>
+
+      <div class="wizard-step" data-step="3">
+        <h3>Configuración inicial</h3>
+        <label>Sucursal principal<input id="companyBranch" placeholder="Providencia"></label>
+        <div class="two-col">
+          <label>Apertura<input id="companyOpen" type="time" value="10:00"></label>
+          <label>Cierre<input id="companyClose" type="time" value="20:00"></label>
+        </div>
+        <label>Nombre del agente IA<input id="companyAgent" value="Sofía"></label>
+        <label>Saludo<textarea id="companyGreeting">Gracias por comunicarte. ¿En qué puedo ayudarte?</textarea></label>
+      </div>
+
+      <div class="wizard-step" data-step="4">
+        <h3>Plantilla por giro</h3>
+        <p class="muted">El sistema puede cargar servicios iniciales según el giro. Después podrás modificarlos.</p>
+        <div id="templatePreview" class="template-preview"></div>
+        <label class="switch-row"><span>Activar agente IA desde el inicio</span><input id="companyAIEnabled" type="checkbox" checked></label>
+      </div>
+
+      <div class="wizard-actions">
+        <button class="btn secondary" id="wizardBack">Atrás</button>
+        <button class="btn primary" id="wizardNext">Siguiente</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="modal" id="staffModal">
+    <form class="modal-card" id="staffForm">
+      <div class="modal-head">
+        <div><h2 id="staffModalTitle">Agregar personal</h2><p class="muted">Datos operativos del colaborador.</p></div>
+        <button class="icon-btn close-staff" type="button">×</button>
+      </div>
+      <input type="hidden" id="staffEditId">
+      <div class="two-col">
+        <label>Nombre completo<input id="staffName" required placeholder="Ej. Carlos Ramírez"></label>
+        <label>Nombre corto / alias<input id="staffAlias" required placeholder="Ej. Carlos"></label>
+      </div>
+      <div class="two-col">
+        <label>Puesto<input id="staffRole" required placeholder="Ej. Barbero senior"></label>
+        <label>Estado inicial
+          <select id="staffInitialStatus">
+            <option value="Disponible">Disponible</option>
+            <option value="Ausente">Ausente</option>
+          </select>
+        </label>
+      </div>
+      <div class="permission-box">
+        <strong>Servicios que puede realizar</strong>
+        <div id="staffServiceChecks" class="permission-grid"></div>
+      </div>
+      <div id="staffFormError" class="form-error"></div>
+      <div class="modal-actions">
+        <button class="btn secondary close-staff" type="button">Cancelar</button>
+        <button class="btn primary" type="submit" id="saveStaffBtn">Guardar personal</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal" id="scheduleModal">
+    <div class="modal-card schedule-modal-card">
+      <div class="modal-head">
+        <div><h2>Horario de trabajo</h2><p class="muted" id="scheduleStaffName"></p></div>
+        <button class="icon-btn close-schedule">×</button>
+      </div>
+      <div class="schedule-editor" id="scheduleEditor"></div>
+      <div class="modal-actions">
+        <button class="btn secondary close-schedule">Cancelar</button>
+        <button class="btn primary" id="saveSchedule">Guardar horario</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="blockModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div><h2>Bloqueos y descansos</h2><p class="muted" id="blockStaffName"></p></div>
+        <button class="icon-btn close-block">×</button>
+      </div>
+      <input type="hidden" id="blockStaffId">
+      <div class="two-col">
+        <label>Fecha<input id="blockDate" type="date"></label>
+        <label>Tipo<select id="blockType"><option>Comida</option><option>Descanso</option><option>Vacaciones</option><option>Bloqueo</option></select></label>
+      </div>
+      <div class="two-col">
+        <label>Inicio<input id="blockStart" type="time" value="14:00"></label>
+        <label>Fin<input id="blockEnd" type="time" value="15:00"></label>
+      </div>
+      <label>Nota<input id="blockNote" placeholder="Opcional"></label>
+      <button class="btn primary full-btn block-add-btn" id="saveBlock">+ Agregar bloqueo</button>
+      <div id="blockList" class="block-list"></div>
+      <div class="modal-actions"><button class="btn secondary close-block">Cerrar</button></div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  </div>
+
+  <div class="modal" id="userAdminModal">
+    <form class="modal-card admin-modal-card" id="companyUserForm" novalidate>
+      <div class="modal-head">
+        <div><h2 id="userModalTitle">Crear usuario de empresa</h2><p class="muted">El usuario solo tendrá acceso a la empresa y módulos seleccionados.</p></div>
+        <button class="icon-btn close-user-admin" type="button">×</button>
+      </div>
+      <div class="two-col">
+        <label>Nombre<input id="adminUserName" placeholder="Ej. Ana López"></label>
+        <label>Usuario<input id="adminUsername" placeholder="ana.lopez"></label>
+      </div>
+      <div class="two-col">
+        <label>Correo<input id="adminUserEmail" type="email" placeholder="ana@empresa.com"></label>
+        <label>Contraseña<input id="adminUserPassword" type="password" minlength="8" placeholder="Mínimo 8 caracteres"><small class="field-help" id="adminPasswordHelp">Debe tener por lo menos 8 caracteres.</small></label>
+      </div>
+      <div class="two-col">
+        <label>Empresa<select id="adminUserCompany"></select></label>
+        <label>Rol<select id="adminUserRole"><option value="encargado">Encargado</option><option value="recepcion">Recepción</option><option value="operador">Operador</option></select></label>
+      </div>
+      <div id="adminUserError" class="form-error"></div><div class="permission-box">
+        <strong>Permisos de menú</strong>
+        <div id="permissionChecks" class="permission-grid"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary close-user-admin" type="button">Cancelar</button>
+        <button class="btn primary" id="saveCompanyUser" type="submit">Crear usuario</button>
+      </div>
+    </form>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
